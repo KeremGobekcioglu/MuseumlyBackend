@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: museumly-backend
+#  datasource:
+#    url: ${DB.URL}
+#    username: ${DB_USER}
+#    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate # Flyway creates the schema; Hibernate only checks it
+    open-in-view: false # avoids hidden lazy-loading queries in controllers

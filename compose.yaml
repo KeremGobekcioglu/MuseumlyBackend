@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=museumly'
+      - 'POSTGRES_PASSWORD=museumly'
+      - 'POSTGRES_USER=museumly'
+    ports:
+      - '5432'
