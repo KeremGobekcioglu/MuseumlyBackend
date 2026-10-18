@@ -27,4 +27,10 @@ class HealthCheckTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"));
     }
+
+    @Test
+    void otherEndpointsRequireAuth() throws Exception {
+        mockMvc.perform(get("/actuator/metrics"))   // or any /api/** path
+                .andExpect(status().isForbidden());
+    }
 }
