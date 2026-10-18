@@ -1,4 +1,4 @@
-package com.kg.museumly.backend.config;
+package com.kg.museumly.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
