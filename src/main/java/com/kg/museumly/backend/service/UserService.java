@@ -1,7 +1,9 @@
 package com.kg.museumly.backend.service;
 
 import com.kg.museumly.backend.entity.User;
+import com.kg.museumly.backend.exception.ApiException;
 import com.kg.museumly.backend.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -52,5 +54,13 @@ public class UserService {
                     User newUser = new User(UUID.randomUUID(), googleSub, email, Instant.now());
                     return userRepository.save(newUser);
                 });
+    }
+
+    public User getById(UUID id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "USER_NOT_FOUND", "User no longer exists");
+        }
+        return user.get();
     }
 }

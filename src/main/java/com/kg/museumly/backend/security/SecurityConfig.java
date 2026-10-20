@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -22,7 +23,9 @@ public class SecurityConfig
      * Session is stateless, JWT will be used.
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+            ProblemDetailAuthenticationEntryPoint authenticationEntryPoint,
+            ProblemDetailAccessDeniedHandler accessDeniedHandler) throws Exception
     {
         http
                 .csrf(csrf -> csrf.disable())
@@ -47,9 +50,23 @@ public class SecurityConfig
                                  */
                                 .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(
-                        oauth2 -> oauth2.jwt(Customizer.withDefaults())
-                );
+                /**
+                 * Two different filters can reject a request, so the handlers are registered twice:
+                 * exceptionHandling covers "no token" (stopped by the authenticated() rule), and
+                 * oauth2ResourceServer covers "bad/expired token" (rejected by the Bearer filter itself).
+                 * Both forward to GlobalExceptionHandler so errors share one JSON format.
+                 */
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(Customizer.withDefaults())
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
+                .addFilterBefore(new RequestLoggingFilter(), BearerTokenAuthenticationFilter.class)
+                .addFilterAfter(new UserMdcFilter(), BearerTokenAuthenticationFilter.class);
         return http.build();
     }
 }

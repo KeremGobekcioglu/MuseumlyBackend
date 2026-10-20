@@ -17,3 +17,7 @@ google:
 jwt:
   secret: JBo7SazwzgxdxDVEpI8Q+vNn67U2ElZr1TMtLfoSEZw= # addes as environmetn variable through ide.
   ttl: 30d # 30 DAYS, not minutes.
+
+logging:
+  pattern:
+    level: "%5p [user=%X{userId:-anonymous}]"
