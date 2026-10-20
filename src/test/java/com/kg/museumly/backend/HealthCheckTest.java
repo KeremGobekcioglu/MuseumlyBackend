@@ -31,6 +31,6 @@ class HealthCheckTest {
     @Test
     void otherEndpointsRequireAuth() throws Exception {
         mockMvc.perform(get("/actuator/metrics"))   // or any /api/** path
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 }

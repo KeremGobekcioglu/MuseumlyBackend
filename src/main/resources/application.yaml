@@ -2,7 +2,7 @@ spring:
   application:
     name: museumly-backend
 #  datasource:
-#    url: ${DB.URL}
+#    url: ${DB_URL}
 #    username: ${DB_USER}
 #    password: ${DB_PASSWORD}
   jpa:
@@ -13,3 +13,7 @@ spring:
 google:
   oauth:
     client-id: 1057344497240-av316rha473pnc31eeglphsfcdq80eid.apps.googleusercontent.com
+
+jwt:
+  secret: JBo7SazwzgxdxDVEpI8Q+vNn67U2ElZr1TMtLfoSEZw= # addes as environmetn variable through ide.
+  ttl: 30d # 30 DAYS, not minutes.
