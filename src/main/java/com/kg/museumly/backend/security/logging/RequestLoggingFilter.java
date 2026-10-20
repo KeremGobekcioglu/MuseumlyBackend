@@ -1,4 +1,4 @@
-package com.kg.museumly.backend.security;
+package com.kg.museumly.backend.security.logging;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

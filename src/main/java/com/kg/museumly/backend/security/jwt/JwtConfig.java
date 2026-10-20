@@ -1,4 +1,4 @@
-package com.kg.museumly.backend.security;
+package com.kg.museumly.backend.security.jwt;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package com.kg.museumly.backend.security;
+package com.kg.museumly.backend.security.google;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;

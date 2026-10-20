@@ -1,4 +1,4 @@
-package com.kg.museumly.backend.security;
+package com.kg.museumly.backend.security.jwt;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;

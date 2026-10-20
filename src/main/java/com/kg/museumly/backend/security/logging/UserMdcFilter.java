@@ -1,6 +1,5 @@
-package com.kg.museumly.backend.security;
+package com.kg.museumly.backend.security.logging;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;

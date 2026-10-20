@@ -2,6 +2,8 @@ package com.kg.museumly.backend.security;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.kg.museumly.backend.exception.ApiException;
+import com.kg.museumly.backend.security.google.GoogleTokenVerificationClient;
+import com.kg.museumly.backend.security.google.GoogleTokenVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.security.GeneralSecurityException;

@@ -2,7 +2,7 @@ package com.kg.museumly.backend;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.jayway.jsonpath.JsonPath;
-import com.kg.museumly.backend.security.GoogleTokenVerificationClient;
+import com.kg.museumly.backend.security.google.GoogleTokenVerificationClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

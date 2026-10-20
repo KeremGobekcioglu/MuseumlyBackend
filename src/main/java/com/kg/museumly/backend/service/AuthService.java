@@ -2,8 +2,8 @@ package com.kg.museumly.backend.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.kg.museumly.backend.entity.User;
-import com.kg.museumly.backend.security.GoogleTokenVerifier;
-import com.kg.museumly.backend.security.JwtService;
+import com.kg.museumly.backend.security.google.GoogleTokenVerifier;
+import com.kg.museumly.backend.security.jwt.JwtService;
 import org.springframework.stereotype.Service;
 
 @Service

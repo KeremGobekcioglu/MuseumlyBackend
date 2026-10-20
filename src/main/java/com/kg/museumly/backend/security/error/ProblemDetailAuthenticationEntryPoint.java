@@ -1,4 +1,4 @@
-package com.kg.museumly.backend.security;
+package com.kg.museumly.backend.security.error;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

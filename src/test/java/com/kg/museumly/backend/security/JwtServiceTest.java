@@ -1,6 +1,8 @@
 package com.kg.museumly.backend.security;
 
 
+import com.kg.museumly.backend.security.jwt.JwtConfig;
+import com.kg.museumly.backend.security.jwt.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
