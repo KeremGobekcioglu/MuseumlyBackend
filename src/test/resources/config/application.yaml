@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: museumly-backend
+#  datasource:
+#    url: ${DB_URL}
+#    username: ${DB_USER}
+#    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate # Flyway creates the schema; Hibernate only checks it
+    open-in-view: false # avoids hidden lazy-loading queries in controllers
+
+google:
+  oauth:
+    client-id: 1057344497240-av316rha473pnc31eeglphsfcdq80eid.apps.googleusercontent.com
+
+jwt:
+  secret: U3LM3XP4vWUenm/7H/1I2fRAi5WWTk8VjKWeVNRJTgw= # test-only secret, not used outside tests
+  ttl: 30d # 30 DAYS, not minutes.
+
+logging:
+  pattern:
+    level: "%5p [user=%X{userId:-anonymous}]"
