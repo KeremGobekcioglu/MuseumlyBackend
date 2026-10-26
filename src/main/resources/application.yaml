@@ -18,6 +18,12 @@ jwt:
   secret: ${JWT_SECRET} # addes as environmetn variable through ide.
   ttl: 30d # 30 DAYS, not minutes.
 
+museumly:
+  import:
+    met:
+      enabled: true
+      csv-path: MetObjects.csv # relative to the working dir (project root)
+
 logging:
   pattern:
     level: "%5p [user=%X{userId:-anonymous}]"
