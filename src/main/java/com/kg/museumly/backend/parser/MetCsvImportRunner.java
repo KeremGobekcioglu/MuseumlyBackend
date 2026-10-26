@@ -52,6 +52,12 @@ public class MetCsvImportRunner implements ApplicationRunner {
             return;
         }
 
+        Path csv = Path.of(csvPath);
+        if (!Files.isReadable(csv)) {
+            log.warn("Met CSV import enabled but file not readable at {}, skipping import", csv.toAbsolutePath());
+            return;
+        }
+
         CSVFormat format = CSVFormat.DEFAULT.builder()
                 .setHeader()
                 .setSkipHeaderRecord(true)
@@ -63,7 +69,7 @@ public class MetCsvImportRunner implements ApplicationRunner {
         int nullObjectName = 0;
         int nullYears = 0;
         List<MetCsvRow> batch = new ArrayList<>();
-        try (Reader reader = Files.newBufferedReader(Path.of(csvPath), StandardCharsets.UTF_8);
+        try (Reader reader = Files.newBufferedReader(csv, StandardCharsets.UTF_8);
              CSVParser parser = format.parse(reader)) {
 
             for (CSVRecord record : parser) {
