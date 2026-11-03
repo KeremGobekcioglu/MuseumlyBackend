@@ -26,10 +26,8 @@ Spring Boot backend for the Museumly app (Compose Multiplatform client). It hand
 |---|---|---|---|
 | POST | `/auth/google` | none | Body `{ "idToken": "..." }`. Verifies the Google ID token, creates the user on first login, returns `{ "accessToken": "..." }`. |
 | GET | `/me` | Bearer JWT | Returns `id`, `email`, `createdAt` of the current user. |
-| GET | `/actuator/health` | none | Health check. |
 
-Everything else requires a valid Bearer token. Auth errors (missing, invalid, or expired token) come back as RFC 9457 `ProblemDetail` JSON. Interactive API docs are served by springdoc.
-
+Everything else requires a valid Bearer token. Auth errors (missing, invalid, or expired token) come back as RFC 9457 `ProblemDetail` JSON.
 ## Database
 
 Schema is managed by Flyway (`src/main/resources/db/migration`); Hibernate only validates it (`ddl-auto: validate`).
