@@ -26,10 +26,15 @@ public class MetCsvImportRunner implements ApplicationRunner {
     private static final Logger log = LoggerFactory.getLogger(MetCsvImportRunner.class);
 
     private static final Set<String> DEPARTMENTS = Set.of(
-            "European Paintings",
-            "European Sculpture and Decorative Arts",
-            "Islamic Art",
-            "Asian Art"
+            "Ancient West Asian Art",                      // 3
+            "Arts of Africa, Oceania, and the Americas",   // 5
+            "Asian Art",                                   // 6
+            "Egyptian Art",                                // 10
+            "European Paintings",                          // 11
+            "European Sculpture and Decorative Arts",      // 12
+            "Greek and Roman Art",                         // 13
+            "Islamic Art",                                 // 14
+            "Medieval Art"                                 // 17
     );
 
     private final boolean enabled;
@@ -65,9 +70,6 @@ public class MetCsvImportRunner implements ApplicationRunner {
 
         int total = 0;
         int kept = 0;
-        int nullTitle = 0;
-        int nullObjectName = 0;
-        int nullYears = 0;
         List<MetCsvRow> batch = new ArrayList<>();
         try (Reader reader = Files.newBufferedReader(csv, StandardCharsets.UTF_8);
              CSVParser parser = format.parse(reader)) {
@@ -89,15 +91,6 @@ public class MetCsvImportRunner implements ApplicationRunner {
 
                 MetCsvRow row = MetCsvMapper.toRow(record);
                 batch.add(row);
-//                if (row.title() == null) {
-//                    nullTitle = nullTitle + 1;
-//                }
-//                if (row.objectName() == null) {
-//                    nullObjectName = nullObjectName + 1;
-//                }
-//                if (row.beginYear() == null) {
-//                    nullYears = nullYears + 1;
-//                }
                 if(batch.size() == BATCH_SIZE)
                 {
                     metArtworkWriter.upsertBatch(batch);
@@ -110,8 +103,6 @@ public class MetCsvImportRunner implements ApplicationRunner {
             }
         }
 
-//        log.info("Met CSV dry run: {} rows read, {} kept, {} null title, {} null objectName, {} null years",
-//                total, kept, nullTitle, nullObjectName, nullYears);
         log.info("Met CSV import: {} rows read, {} upserted", total, kept);
     }
 }

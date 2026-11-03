@@ -35,3 +35,9 @@ build/
 secrets/
 /config/
 MetObjects.csv
+
+# Local analysis report
+local-db-era-analysis.md
+
+cleveland.csv
+cleveland-met-date-analysis.md
