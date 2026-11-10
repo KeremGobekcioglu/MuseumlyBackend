@@ -21,3 +21,8 @@ jwt:
 logging:
   pattern:
     level: "%5p [user=%X{userId:-anonymous}]"
+
+museumly:
+  crawler:
+    met:
+      enabled: false
