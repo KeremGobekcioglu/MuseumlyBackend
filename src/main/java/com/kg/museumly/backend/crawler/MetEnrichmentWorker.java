@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 
@@ -21,6 +23,14 @@ public class MetEnrichmentWorker {
     private final MetCandidatePicker picker;
     private final MetObjectClient client;
     private final MetEnrichmentWriter writer;
+
+    private static final Duration IDLE_PAUSE = Duration.ofMinutes(1);
+    private static final Duration FIRST_COOLDOWN = Duration.ofMinutes(1);
+    private static final Duration MAX_COOLDOWN = Duration.ofMinutes(30);
+
+    private Instant pausedUntil = Instant.EPOCH;   // 1970 = not paused
+    private Duration currentCooldown = null;       // null = not in a block streak
+
     public MetEnrichmentWorker(
             @Value("${museumly.crawler.met.target-per-department}") int targetPerDepartment,
             @Value("${museumly.crawler.met.pacing-ms}") long pacingMs, MetCandidatePicker picker, MetObjectClient client, MetEnrichmentWriter writer
@@ -36,8 +46,21 @@ public class MetEnrichmentWorker {
     @Scheduled(fixedDelay = 1000)
     public void tick() throws InterruptedException
     {
+        // check if we have active wait time
+        if(Instant.now().isBefore(pausedUntil))
+        {
+            return;
+        }
         // select candidates
         List<MetCandidate> candidates= picker.pickNext(targetPerDepartment);
+        // empty means we need to wait in idle state
+        if(candidates.isEmpty())
+        {
+            log.info("idle");
+            pausedUntil = Instant.now().plus(IDLE_PAUSE);
+
+            return;
+        }
         // enrich every candidate
         for(MetCandidate candidate: candidates)
         {
@@ -49,8 +72,42 @@ public class MetEnrichmentWorker {
             } else {
                 log.info("met {} ({}) → {}: {}", candidate.sourceId(), candidate.department(), result.outcome(), result.error());
             }
+            // 403, 429 ... we need to wait.
+            if(result.blocked())
+            {
+                startCooldown(result);
+                return;
+            }
+            // reset cooldown, everything is good.
+            currentCooldown = null;
             // sleep 1.5ms between calls.
             Thread.sleep(pacingMs);
         }
+    }
+
+    private void startCooldown(MetFetchResult result)
+    {
+        // if this function is called first time, cooldown should be one minute
+        if(currentCooldown == null)
+        {
+            currentCooldown = FIRST_COOLDOWN;
+        }
+        // double
+        else
+        {
+            Duration doubled = currentCooldown.multipliedBy(2);
+            // check if it surpasses 30, which is max.
+            if(doubled.compareTo(MAX_COOLDOWN) > 0)
+            {
+                currentCooldown = MAX_COOLDOWN;
+            }
+            else
+            {
+                currentCooldown = doubled;
+            }
+        }
+        // pause until cooldown ends.
+        pausedUntil = Instant.now().plus(currentCooldown);
+        log.warn("met blocked ({}); pausing {} min until {}", result.error(), currentCooldown.toMinutes(), pausedUntil);
     }
 }

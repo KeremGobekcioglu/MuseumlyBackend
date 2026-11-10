@@ -10,6 +10,7 @@ import java.util.List;
 @Component
 public class MetCandidatePicker {
 
+    // that '?' is target per department. so if it s number N, query will return until it reaches N.
     private static final String PICK_SQL = """
             SELECT DISTINCT ON (a.department)
                    a.id, a.source_id, a.department
@@ -34,6 +35,7 @@ public class MetCandidatePicker {
 
     public List<MetCandidate> pickNext(int targetPerDepartment)
     {
+        // that '?' is target per department.
         return jdbcTemplate.query(PICK_SQL, this::mapRow, targetPerDepartment);
     }
 
