@@ -26,7 +26,7 @@ museumly:
   crawler:
     met:
       enabled: true
-      target-per-department: 100
+      target-per-department: 2
       pacing-ms: 1500
 
 logging:
