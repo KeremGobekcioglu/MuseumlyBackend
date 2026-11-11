@@ -44,7 +44,7 @@ public class MetEnrichmentWorker {
     }
 
     @Scheduled(fixedDelay = 1000)
-    public void tick() throws InterruptedException
+    public void tick()
     {
         // check if we have active wait time
         if(Instant.now().isBefore(pausedUntil))
@@ -58,7 +58,6 @@ public class MetEnrichmentWorker {
         {
             log.info("idle");
             pausedUntil = Instant.now().plus(IDLE_PAUSE);
-
             return;
         }
         // enrich every candidate
@@ -66,6 +65,17 @@ public class MetEnrichmentWorker {
         {
             // get images for each met artwork.
             MetFetchResult result = client.fetch(candidate.sourceId());
+            //İF RESULT is not blocked , wait 1.5 seconds and try again
+            if(result.outcome() == MetOutcome.FAILED && !result.blocked())
+            {
+                log.info("met {} ({}) → FAILED: {}; retrying",
+                        candidate.sourceId(), candidate.department(), result.error());
+                if(!sleepPacing())
+                {
+                    return;
+                }
+                result = client.fetch(candidate.sourceId());
+            }
             writer.save(candidate.id(), result);
             if (result.error() == null) {
                 log.info("met {} ({}) → {}", candidate.sourceId(), candidate.department(), result.outcome());
@@ -81,7 +91,10 @@ public class MetEnrichmentWorker {
             // reset cooldown, everything is good.
             currentCooldown = null;
             // sleep 1.5ms between calls.
-            Thread.sleep(pacingMs);
+            if(!sleepPacing())
+            {
+                return;
+            }
         }
     }
 
@@ -109,5 +122,16 @@ public class MetEnrichmentWorker {
         // pause until cooldown ends.
         pausedUntil = Instant.now().plus(currentCooldown);
         log.warn("met blocked ({}); pausing {} min until {}", result.error(), currentCooldown.toMinutes(), pausedUntil);
+    }
+
+    private boolean sleepPacing()
+    {
+        try {
+            Thread.sleep(pacingMs);
+            return true;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
     }
 }
