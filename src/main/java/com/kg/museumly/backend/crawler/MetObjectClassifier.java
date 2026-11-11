@@ -2,6 +2,11 @@ package com.kg.museumly.backend.crawler;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+/**
+ * REJECTED: 404, NO PUBLIC DOMAIN, NO IMAGE.
+ * FAILED: STATUS != 200, NO BODY, PUBLIC DOMAIN NULL
+ * BLOCKED: 403, 429
+ */
 public final class MetObjectClassifier {
 
     private MetObjectClassifier(){}
