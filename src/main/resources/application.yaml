@@ -23,6 +23,11 @@ museumly:
     met:
       enabled: false # opt in with MUSEUMLY_IMPORT_MET_ENABLED=true for a one-off import
       csv-path: MetObjects.csv # relative to the working dir (project root); override with MUSEUMLY_IMPORT_MET_CSV_PATH
+  crawler:
+    met:
+      enabled: true
+      target-per-department: 2
+      pacing-ms: 1500
 
 logging:
   pattern:
