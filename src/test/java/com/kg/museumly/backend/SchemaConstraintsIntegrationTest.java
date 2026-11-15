@@ -29,7 +29,7 @@ class SchemaConstraintsIntegrationTest {
         Integer failed = jdbcTemplate.queryForObject(
                 "SELECT count(*) FROM flyway_schema_history WHERE NOT success", Integer.class);
 
-        assertThat(applied).isEqualTo(4);   // V1..V4
+        assertThat(applied).isEqualTo(5);   // V1..V4
         assertThat(failed).isZero();
     }
 
