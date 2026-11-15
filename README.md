@@ -38,7 +38,7 @@ Schema is managed by Flyway (`src/main/resources/db/migration`); Hibernate only 
 
 ## Met import
 
-`MetCsvImportRunner` reads the Met Open Access `MetObjects.csv` and upserts rows in batches of 1000. It keeps only public-domain objects in these departments: European Paintings, European Sculpture and Decorative Arts, Islamic Art, Asian Art. Re-running is safe; existing rows are updated by `(source, source_id)`.
+`MetCsvImportRunner` reads the Met Open Access `MetObjects.csv` and upserts rows in batches of 1000. It keeps only public-domain objects in these 9 departments: Ancient West Asian Art; Arts of Africa, Oceania, and the Americas; Asian Art; Egyptian Art; European Paintings; European Sculpture and Decorative Arts; Greek and Roman Art; Islamic Art; Medieval Art. Re-running is safe; existing rows are updated by `(source, source_id)`.
 
 It is disabled by default. To run it once:
 
