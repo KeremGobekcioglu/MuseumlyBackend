@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @Transactional
@@ -113,5 +114,37 @@ public class ArtworkRepositoryTest {
 
         assertEquals(List.of(spanning), ids(bce));
         assertEquals(List.of(), ids(ce));
+    }
+    @Test
+    void waitingRowAfterTheCursorCountsButBeforeItDoesNot() {
+        long waiting = insert(PAINTINGS, "DISCOVERED", 1600, 1650);
+        long accepted = insert(PAINTINGS, "ACCEPTED", 1600, 1650);
+
+        assertTrue(repository.existsWaitingAfter(PAINTINGS, 0, null, null));
+        assertFalse(repository.existsWaitingAfter(PAINTINGS, accepted, null, null));
+    }
+
+    @Test
+    void failedRowsCountAsWaiting() {
+        insert(PAINTINGS, "FAILED", 1600, 1650);
+
+        assertTrue(repository.existsWaitingAfter(PAINTINGS, 0, null, null));
+    }
+
+    @Test
+    void acceptedAndRejectedRowsAreNotWaiting() {
+        insert(PAINTINGS, "ACCEPTED", 1600, 1650);
+        insert(PAINTINGS, "REJECTED", 1600, 1650);
+
+        assertFalse(repository.existsWaitingAfter(PAINTINGS, 0, null, null));
+    }
+
+    @Test
+    void waitingCheckStaysInsideTheSlice() {
+        insert(PAINTINGS, "DISCOVERED", 1650, 1650);
+        insert(ASIAN, "DISCOVERED", 1750, 1750);
+
+        assertTrue(repository.existsWaitingAfter(PAINTINGS, 0, 1600, 1699));
+        assertFalse(repository.existsWaitingAfter(PAINTINGS, 0, 1700, 1799));
     }
 }

@@ -28,4 +28,23 @@ public interface ArtworkRepository extends Repository<Artwork, Long> {
             @Param("toYear") Integer toYear,
             Limit limit
     );
+    @Query("""
+        SELECT a.id FROM Artwork a
+        WHERE a.source = 'met'
+          AND a.status IN ('DISCOVERED', 'FAILED')
+          AND a.department = :department
+          AND a.id > :afterId
+          AND (:fromYear IS NULL OR a.eraYear BETWEEN :fromYear AND :toYear)
+        """)
+    List<Long> findWaitingIds(
+            @Param("department") String department,
+            @Param("afterId") long afterId,
+            @Param("fromYear") Integer fromYear,
+            @Param("toYear") Integer toYear,
+            Limit limit);
+
+    default boolean existsWaitingAfter(String department, long afterId, Integer fromYear, Integer toYear) {
+        List<Long> ids = findWaitingIds(department, afterId, fromYear, toYear, Limit.of(1));
+        return !ids.isEmpty();
+    }
 }
