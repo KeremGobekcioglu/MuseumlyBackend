@@ -4,7 +4,7 @@ import com.kg.museumly.backend.dtos.artwork.MetArtworkPage;
 import com.kg.museumly.backend.entity.Artwork;
 import com.kg.museumly.backend.met.MetDepartment;
 import com.kg.museumly.backend.repository.ArtworkRepository;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -53,9 +53,34 @@ public class MetArtworkServiceTest {
         assertTrue(page.exhausted());
     }
 
+    @Test
+    public void titleFallsBackToObjectNameThenUntitled() {
+        List<Artwork> rows = List.of(
+                artwork(1, "Flora and Zephyr", "Painting"),
+                artwork(2, null, "Bowl"),
+                artwork(3, null, null),
+                artwork(4, "  ", "Vase"),
+                artwork(5, "", " "));
+        when(repository.findAcceptedPage(any(), anyLong(), any(), any(), any())).thenReturn(rows);
+
+        MetArtworkPage page = service.page(MetDepartment.EUROPEAN_PAINTINGS, 0, null, null, 5);
+
+        assertEquals("Flora and Zephyr", page.items().get(0).title());
+        assertEquals("Bowl", page.items().get(1).title());
+        assertEquals("Untitled", page.items().get(2).title());
+        assertEquals("Vase", page.items().get(3).title());
+        assertEquals("Untitled", page.items().get(4).title());
+    }
+
     private Artwork artwork(long id) {
+        return artwork(id, null, null);
+    }
+
+    private Artwork artwork(long id, String title, String objectName) {
         Artwork artwork = mock(Artwork.class);
         when(artwork.getId()).thenReturn(id);
+        when(artwork.getTitle()).thenReturn(title);
+        when(artwork.getObjectName()).thenReturn(objectName);
         return artwork;
     }
 }

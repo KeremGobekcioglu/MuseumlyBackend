@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 public class MetArtworkService {
     private final ArtworkRepository repository;
-
+    private static final String UNTITLED = "Untitled";
     public MetArtworkService(ArtworkRepository repository) {
         this.repository = repository;
     }
@@ -52,7 +52,7 @@ public class MetArtworkService {
     private MetArtworkItem toItem(Artwork artwork) {
         return new MetArtworkItem(
                 artwork.getSourceId(),
-                artwork.getTitle(),
+                displayTitle(artwork),
                 artwork.getArtistDisplayName(),
                 artwork.getArtistDisplayBio(),
                 artwork.getObjectDate(),
@@ -68,5 +68,14 @@ public class MetArtworkService {
                 artwork.getImageUrl(),
                 artwork.getImageWidth(),
                 artwork.getImageHeight());
+    }
+    private String displayTitle(Artwork artwork) {
+        if (artwork.getTitle() != null && !artwork.getTitle().isBlank()) {
+            return artwork.getTitle();
+        }
+        if (artwork.getObjectName() != null && !artwork.getObjectName().isBlank()) {
+            return artwork.getObjectName();
+        }
+        return UNTITLED;
     }
 }
