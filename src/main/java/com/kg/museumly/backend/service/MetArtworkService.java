@@ -39,14 +39,16 @@ public class MetArtworkService {
             // update next id with the last items id in the list.
             nextAfterId = artworkList.getLast().getId();
         }
-        // check if we department is exhaused
+        // Exhausted = "nothing more will ever come, stop asking".
+        // Full page: there may be more, so not exhausted, and no second query.
+        // Short page: ask the DB if any row in this slice is still waiting (DISCOVERED/FAILED)
+        // after nextAfterId. If yes, it may become ACCEPTED later, so not exhausted.
+        // Uses nextAfterId, not afterId: the next request starts there, so waiting rows
+        // behind it can never reach this user and must not count.
         boolean exhausted;
-        if(artworkList.size() < size)
-        {
-            exhausted = !repository.existsWaitingAfter(departmentName, nextAfterId, fromYear,toYear);
-        }
-        else
-        {
+        if (artworkList.size() < size) {
+            exhausted = !repository.existsWaitingAfter(departmentName, nextAfterId, fromYear, toYear);
+        } else {
             exhausted = false;
         }
         List<MetArtworkItem> items = new ArrayList<>();
