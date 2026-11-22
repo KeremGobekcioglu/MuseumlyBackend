@@ -40,7 +40,15 @@ public class MetArtworkService {
             nextAfterId = artworkList.getLast().getId();
         }
         // check if we department is exhaused
-        boolean exhausted = artworkList.size() < size;
+        boolean exhausted;
+        if(artworkList.size() < size)
+        {
+            exhausted = !repository.existsWaitingAfter(departmentName, nextAfterId, fromYear,toYear);
+        }
+        else
+        {
+            exhausted = false;
+        }
         List<MetArtworkItem> items = new ArrayList<>();
         for(Artwork artwork : artworkList)
         {

@@ -72,6 +72,34 @@ public class MetArtworkServiceTest {
         assertEquals("Untitled", page.items().get(4).title());
     }
 
+    @Test
+    void fullPage_doesNotRunWaitingCheck() {
+        Artwork first = artwork(1L);
+        Artwork second = artwork(2L);
+        when(repository.findAcceptedPage(eq(PAINTINGS), eq(0L), isNull(), isNull(), any()))
+                .thenReturn(List.of(first, second));
+
+        MetArtworkPage page = service.page(MetDepartment.EUROPEAN_PAINTINGS, 0L, null, null, 2);
+
+        assertFalse(page.exhausted());
+        verify(repository, never()).existsWaitingAfter(any(), anyLong(), any(), any());
+    }
+
+    @Test
+    void shortPage_withRowsWaiting_isNotExhausted_andChecksFromNewPosition() {
+        Artwork first = artwork(7L);
+        Artwork second = artwork(9L);
+        when(repository.findAcceptedPage(eq(PAINTINGS), eq(5L), eq(1600), eq(1699), any()))
+                .thenReturn(List.of(first, second));
+        when(repository.existsWaitingAfter(PAINTINGS, 9L, 1600, 1699)).thenReturn(true);
+
+        MetArtworkPage page = service.page(MetDepartment.EUROPEAN_PAINTINGS, 5L, 1600, 1699, 20);
+
+        assertEquals("9", page.nextCursor());
+        assertFalse(page.exhausted());
+        verify(repository).existsWaitingAfter(PAINTINGS, 9L, 1600, 1699);
+    }
+
     private Artwork artwork(long id) {
         return artwork(id, null, null);
     }
