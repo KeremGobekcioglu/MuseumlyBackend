@@ -43,7 +43,7 @@ public class SecurityConfig
                 )
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/actuator/health", "/auth/**")
+                                .requestMatchers("/actuator/health", "/auth/**", "/met/**")
                                 /**
                                  * .requestMatchers("/actuator/health", "/auth/**").permitAll()
                                  * any request matching either of these paths needs no authentication
