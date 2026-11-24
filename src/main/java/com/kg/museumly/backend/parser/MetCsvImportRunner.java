@@ -1,5 +1,6 @@
 package com.kg.museumly.backend.parser;
 
+import com.kg.museumly.backend.met.MetDepartment;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -25,17 +26,7 @@ public class MetCsvImportRunner implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(MetCsvImportRunner.class);
 
-    private static final Set<String> DEPARTMENTS = Set.of(
-            "Ancient West Asian Art",                      // 3
-            "Arts of Africa, Oceania, and the Americas",   // 5
-            "Asian Art",                                   // 6
-            "Egyptian Art",                                // 10
-            "European Paintings",                          // 11
-            "European Sculpture and Decorative Arts",      // 12
-            "Greek and Roman Art",                         // 13
-            "Islamic Art",                                 // 14
-            "Medieval Art"                                 // 17
-    );
+    private static final Set<String> DEPARTMENTS = MetDepartment.csvNames();
 
     private final boolean enabled;
     private final String csvPath;
