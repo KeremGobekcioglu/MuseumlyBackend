@@ -9,8 +9,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Configuration means read this class at start up and register whatever @Bean methods
@@ -19,6 +26,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig
 {
+    // Anyone may call these, and the token is not even read on them.
+    private static final String[] PUBLIC_PATHS = {"/actuator/health", "/auth/**", "/met/**"};
     /**
      * @Bean means “Spring, take the object this method returns and manage it.”
      * CSRF: off. CSRF protection defends against a malicious website making
@@ -43,7 +52,7 @@ public class SecurityConfig
                 )
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/actuator/health", "/auth/**", "/met/**")
+                                .requestMatchers(PUBLIC_PATHS)
                                 /**
                                  * .requestMatchers("/actuator/health", "/auth/**").permitAll()
                                  * any request matching either of these paths needs no authentication
@@ -65,6 +74,7 @@ public class SecurityConfig
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
+                        .bearerTokenResolver(publicPathsIgnoreToken())
                         .jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
@@ -72,5 +82,25 @@ public class SecurityConfig
                 .addFilterBefore(new RequestLoggingFilter(), BearerTokenAuthenticationFilter.class)
                 .addFilterAfter(new UserMdcFilter(), BearerTokenAuthenticationFilter.class);
         return http.build();
+    }
+    // Public path → null (no token, anonymous), so a bad or expired token can't cause a 401.
+    // Anywhere else → Spring's default: the Authorization: Bearer header.
+    private BearerTokenResolver publicPathsIgnoreToken()
+    {
+        DefaultBearerTokenResolver defaultBearerTokenResolver = new DefaultBearerTokenResolver();
+        List<RequestMatcher> publicMatchers = new ArrayList<>();
+        for (String path : PUBLIC_PATHS) {
+            publicMatchers.add(PathPatternRequestMatcher.withDefaults().matcher(path));
+        }
+        return request -> {
+            for(RequestMatcher matcher : publicMatchers)
+            {
+                if(matcher.matches(request))
+                {
+                    return null;
+                }
+            }
+            return defaultBearerTokenResolver.resolve(request);
+        };
     }
 }
