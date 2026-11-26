@@ -99,7 +99,36 @@ public class MetArtworkServiceTest {
         assertFalse(page.exhausted());
         verify(repository).existsWaitingAfter(PAINTINGS, 9L, 1600, 1699);
     }
+    @Test
+    void multiArtistValuesKeepOnlyTheFirstPart() {
+        List<Artwork> rows = List.of(
+                withArtist(1, "Jacques d'Arthois|Flemish Painter", "Flemish, Brussels 1613–1686|Flemish"),
+                withArtist(2, "Joseph Marie Vien", "French, Montpellier 1716–1809 Paris"),
+                withArtist(3, "Anonymous |Workshop of Rubens", "|Flemish, Antwerp"),
+                withArtist(4, null, null));
+        when(repository.findAcceptedPage(any(), anyLong(), any(), any(), any())).thenReturn(rows);
 
+        MetArtworkPage page = service.page(MetDepartment.EUROPEAN_PAINTINGS, 0, null, null, 4);
+
+        assertEquals("Jacques d'Arthois", page.items().get(0).artist());
+        assertEquals("Flemish, Brussels 1613–1686", page.items().get(0).artistBio());
+        // no pipe: unchanged
+        assertEquals("Joseph Marie Vien", page.items().get(1).artist());
+        assertEquals("French, Montpellier 1716–1809 Paris", page.items().get(1).artistBio());
+        // space before the bar is trimmed; an empty first bio becomes null
+        assertEquals("Anonymous", page.items().get(2).artist());
+        assertNull(page.items().get(2).artistBio());
+        assertNull(page.items().get(3).artist());
+        assertNull(page.items().get(3).artistBio());
+    }
+
+    private Artwork withArtist(long id, String artist, String bio) {
+        Artwork artwork = mock(Artwork.class);
+        when(artwork.getId()).thenReturn(id);
+        when(artwork.getArtistDisplayName()).thenReturn(artist);
+        when(artwork.getArtistDisplayBio()).thenReturn(bio);
+        return artwork;
+    }
     private Artwork artwork(long id) {
         return artwork(id, null, null);
     }
