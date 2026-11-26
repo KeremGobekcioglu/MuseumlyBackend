@@ -63,8 +63,8 @@ public class MetArtworkService {
         return new MetArtworkItem(
                 artwork.getSourceId(),
                 displayTitle(artwork),
-                artwork.getArtistDisplayName(),
-                artwork.getArtistDisplayBio(),
+                firstPart(artwork.getArtistDisplayName()),
+                firstPart(artwork.getArtistDisplayBio()),
                 artwork.getObjectDate(),
                 artwork.getBeginYear(),
                 artwork.getClassification(),
@@ -87,5 +87,16 @@ public class MetArtworkService {
             return artwork.getObjectName();
         }
         return UNTITLED;
+    }
+    // The CSV joins several constituents with '|'. Clients get the first one,
+    // as the Met API's display fields did. Name and bio parts line up (checked on the server).
+    // indexOf, not split("|"): split takes a regex, where '|' means "or".
+    private static String firstPart(String raw) {
+        if (raw == null) {
+            return null;
+        }
+        int bar = raw.indexOf('|');
+        String first = (bar < 0 ? raw : raw.substring(0, bar)).trim();
+        return first.isEmpty() ? null : first;
     }
 }
